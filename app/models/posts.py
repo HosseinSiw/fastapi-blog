@@ -6,6 +6,9 @@ from datetime import datetime
 
 
 class Post(Base):
+    """
+    The main Post model
+    """
     __tablename__ = 'posts'
     
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
@@ -14,12 +17,18 @@ class Post(Base):
     summary = Column(String(255), nullable=False)
     
     author_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-
+    category_id = Column(
+    Integer,
+    ForeignKey("categories.id", ondelete="SET NULL"),
+    nullable=True
+    )
+    
     created_at = Column(DateTime, default=datetime.now())
     updated_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
     is_published = Column(Boolean, default=True)
     
     author = relationship("User", back_populates="posts")
+    category = relationship("Category", back_populates="posts")
     
     def __repr__(self):
         return f"<Post(title='{self.title}', author_id={self.author_id})>"
