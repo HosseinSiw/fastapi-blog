@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from typing import List
 from models.user import User
+from models.category import Category
 from schemas.posts import (PostRetriveSchema,
                            PostCreationSchema,
                            PostUpdateSchema)
@@ -14,10 +15,11 @@ from typing import Optional
 post_router = APIRouter(prefix='/posts', tags=['posts'])
 
 
-# GET -- retrive all published posts
+# GET -- retrive all published posts, support both search and filter by category name.
 @post_router.get('/', status_code=status.HTTP_200_OK, response_model=List[PostRetriveSchema])
 def get_posts(db: Session = Depends(get_db),
     search: Optional[str] = Query(None, description="Search in title or content"),
+    category: Optional[str] = Query(None, description="Filter Posts by their category"),
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),):
     
@@ -29,6 +31,12 @@ def get_posts(db: Session = Depends(get_db),
                 Post.content.ilike(f"%{search}%")
             )
         )
+    if category:
+        category_obj = db.query(Category).filter(Category.name.ilike(category)).first()
+        if not category_obj:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"Error": "Category not found"})
+    
+        query = query.filter(Post.category_id==Category.id)
 
     posts = query.order_by(Post.created_at.desc()).offset(offset).limit(limit).all()
     count = query.count()
@@ -40,7 +48,7 @@ def get_posts(db: Session = Depends(get_db),
 # GET -- retrive a single post based on it id (primary key)
 @post_router.get('/{post_id}/', status_code=200, response_model=PostRetriveSchema)
 def get_single_post(post_id: int, db: Session = Depends(get_db)):
-    post = db.query(Post).filter(Post.id==post_id, Post.is_published==True).first()
+    post = db.query(Post).filter(Post.id==post_id).filter(Post.is_published==True).first()
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Post not found')
     
@@ -51,12 +59,29 @@ def get_single_post(post_id: int, db: Session = Depends(get_db)):
 def create_post(post_data: PostCreationSchema, 
                 db: Session=Depends(get_db), 
                 current_user: User=Depends(get_current_user)):
-    post = Post(**post_data.model_dump(), author_id = current_user.id)
     
-    db.add(post)
+    category_name = post_data.category_name.strip().lower()
+    category = db.query(Category).filter(Category.name.ilike(category_name)).first()
+    
+    if not category:
+        category = Category(name=category_name)
+        db.add(category)
+        db.commit()
+        db.refresh(category)
+    
+    
+    new_post = Post(
+            title=post_data.title,
+            content=post_data.content,
+            summary=post_data.summary,
+            author_id=post_data.author_id,
+            category_id=category.id
+    )
+    
+    db.add(new_post)
     db.commit()
-    db.refresh(instance=post)
-    return post
+    db.refresh(instance=new_post)
+    return new_post
 
 # PATCH -- Update a post
 @post_router.patch('/{post_id}/', response_model=PostRetriveSchema)
@@ -71,6 +96,15 @@ def update_post(post_id: int,
     
     if not post.author_id == current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Not allowed')
+    
+    if "category_name" in post_data.model_dump(exclude_unset=True):
+        category = db.query(Category).filter(Category.name.ilike(post_data.category_name)).first()
+        if not category:
+            category = Category(name=post_data.category_name)
+            db.add(category)
+            db.commit()
+            db.refresh(category)
+        post.category_id = category.id
     
     for key, value in post_data.model_dump(exclude_unset=True).items():
         setattr(post, key, value)

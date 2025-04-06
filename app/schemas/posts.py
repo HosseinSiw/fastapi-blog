@@ -1,11 +1,12 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from datetime import datetime
+
 
 # Post base, shared information within all HTTP methods
 class PostBase(BaseModel):
-    title: str
-    content: str
-    summary: str
+    title: str = Field(..., max_length=255, description="Post title")
+    content: str = Field(..., max_length=255, description="Post content")
+    summary: str = Field(..., max_length=255, description="a short summary of post content")
     
     model_config = ConfigDict(from_attributes=True)
 
@@ -24,13 +25,26 @@ class PostRetriveSchema(PostBase):
     created_at: datetime
     updated_at: datetime
     author: UserPost 
-    
+    category_name: str
     model_config = ConfigDict(from_attributes=True)   
-
 
 # Post method, for creating posts 
 class PostCreationSchema(PostBase):
-    pass
+    category_name: str
+    is_published: bool = True
+    
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "title": "How AI is Changing Coding",
+                "content": "Lots of cool things...",
+                "summary": "An overview of AI's impact on dev life.",
+                "category_name": "technology"
+            }
+        }
+    )
+    
 
 # PATCH method.
 class PostUpdateSchema(BaseModel):
@@ -38,5 +52,5 @@ class PostUpdateSchema(BaseModel):
     content: str | None = None
     summary: str | None = None
     is_published: bool | None = None
-    
+    category_name: str | None = None
     model_config = ConfigDict(from_attributes=True)
