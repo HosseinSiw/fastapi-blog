@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from datetime import datetime
+from typing import List, Optional
 
 
 # Post base, shared information within all HTTP methods
@@ -16,17 +17,21 @@ class UserPost(BaseModel):
     id: int
     email: EmailStr
     name: str
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, orm_mode=True)
     
 # Get method 2
 class PostRetriveSchema(PostBase):
     id: int
-    author_id: int
     created_at: datetime
     updated_at: datetime
     author: UserPost 
-    category_name: str
-    model_config = ConfigDict(from_attributes=True)   
+    category_name: Optional[str] = None
+    model_config = ConfigDict(from_attributes=True, orm_mode=True)   
+
+class GetAllPostsRetreiveSchema(BaseModel):
+    total_count: int
+    posts: List[PostRetriveSchema]
+    
 
 # Post method, for creating posts 
 class PostCreationSchema(PostBase):

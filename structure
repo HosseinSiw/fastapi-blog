@@ -57,5 +57,5 @@ fastapi_blog/
 ├── docker-compose.yml  # Optional, for containerized setup
 ├── Dockerfile  # Optional, to containerize your app
 
-access:
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJoMUBhZG1pbi5jb20gYWRtaW4iLCJleHBpcmUgdGltZSI6MTc0NDExMDUzOH0.p9OMBtr0QKfTsFErGs79LRpv5coSkNdpH8ERcUXGs98",
+
+"access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJob3NAZ21haWwuY29tIHN1cGVybmFtZSIsImV4cGlyZSB0aW1lIjoxNzQ0NDQ5MzQ4fQ.Ml2bb2krNZ87kiEHRYtQ980BNlJDVtXJnj_o-bqx6fU",
