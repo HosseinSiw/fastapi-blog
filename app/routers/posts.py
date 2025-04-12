@@ -68,20 +68,24 @@ def create_post(post_data: PostCreationSchema,
         db.add(category)
         db.commit()
         db.refresh(category)
-    
-    
+        
+    user_email = current_user['sub'].split(' ')[0]
+    user = db.query(User).filter(User.email == user_email).first()
     new_post = Post(
             title=post_data.title,
             content=post_data.content,
             summary=post_data.summary,
-            author_id=post_data.author_id,
+            author_id=user.id,
             category_id=category.id
     )
     
     db.add(new_post)
     db.commit()
     db.refresh(instance=new_post)
-    return new_post
+    return PostRetriveSchema(
+    **new_post.__dict__,
+    category_name=new_post.category.name
+    )
 
 # PATCH -- Update a post
 @post_router.patch('/{post_id}/', response_model=PostRetriveSchema)

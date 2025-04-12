@@ -10,16 +10,15 @@ ALGORITHM = os.getenv("HASH_ALGORITHM")
 
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-oauth2_schema = OAuth2PasswordBearer(tokenUrl='login')
+oauth2_schema = OAuth2PasswordBearer(tokenUrl='users/login')
 
 
 def create_access_token(data: dict,):
     to_encode = data.copy()
     expire = datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"expire time": expire})
+    to_encode.update({"expire time": int(expire.timestamp())})
     token = jwt.encode(to_encode, key=SECRET_KEY, algorithm=ALGORITHM)
-    print('Token:', token)
-    return jwt.encode(to_encode, key=SECRET_KEY, algorithm=ALGORITHM)
+    return token
 
 
 def verify_access_token(token: str):

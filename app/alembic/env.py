@@ -20,6 +20,8 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 from db.base import Base
 from models.user import User
+from models.category import Category
+from models.posts import Post
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

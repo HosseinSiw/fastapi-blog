@@ -40,7 +40,7 @@ class PostCreationSchema(PostBase):
                 "title": "How AI is Changing Coding",
                 "content": "Lots of cool things...",
                 "summary": "An overview of AI's impact on dev life.",
-                "category_name": "technology"
+                "category_name": "technology",
             }
         }
     )
