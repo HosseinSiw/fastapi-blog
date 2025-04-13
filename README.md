@@ -12,16 +12,13 @@ A high-performance blog backend built with FastAPI, PostgreSQL, and modern Pytho
   - Rate limiting
   - Caching
   - Background tasks (email notifications)
-- 🧪 100% test coverage with pytest
-- 📊 Admin dashboard (optional)
 
 ## Tech Stack
 
 - **Framework**: FastAPI
-- **Database**: PostgreSQL (with async SQLAlchemy)
+- **Database**: PostgreSQL 
 - **Authentication**: JWT
 - **Cache**: Redis
-- **Search**: Elasticsearch (optional)
 - **Containerization**: Docker
 - **CI/CD**: GitHub Actions
 
