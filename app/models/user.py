@@ -17,3 +17,4 @@ class User(Base):
     is_superuser: bool = Column(Boolean, default=False)
     
     posts = relationship("Post", back_populates="author", cascade="all, delete")
+    comments = relationship("Comment", back_populates="author")

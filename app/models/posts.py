@@ -29,6 +29,7 @@ class Post(Base):
     
     author = relationship("User", back_populates="posts")
     category = relationship("Category", back_populates="posts")
+    comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<Post(title='{self.title}', author_id={self.author_id})>"

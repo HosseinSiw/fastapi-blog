@@ -22,6 +22,8 @@ from db.base import Base
 from models.user import User
 from models.category import Category
 from models.posts import Post
+from models.comments import Comment
+
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

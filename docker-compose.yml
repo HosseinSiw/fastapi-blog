@@ -4,13 +4,28 @@ services:
     container_name: backend
     ports:
       - "8001:8001"
-    command: python main.py
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 8001 
     volumes:
       - ./app:/app
     depends_on:
       - db
+      - redis
     env_file:
       - .env
+  redis:
+    container_name: redis
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - redis_data:/data
+
   db:
     image: postgres:15
     container_name: main_db
@@ -32,4 +47,5 @@ services:
       - "5050:80"
 
 volumes:
+  redis_data:
   postgres_data:

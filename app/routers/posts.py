@@ -10,13 +10,15 @@ from schemas.posts import (PostRetriveSchema,
                            PostCreationSchema,
                            PostUpdateSchema, GetAllPostsRetreiveSchema, UserPost)
 from typing import Optional
+# from fastapi_cache.decorators import cache
+import os
 
 
 post_router = APIRouter(prefix='/posts', tags=['posts'])
-
-
+cache_time: int = os.getenv("CACHE_MINUTES") * 60 
 # GET -- retrive all published posts, support both search and filter by category name.
 @post_router.get('/', status_code=status.HTTP_200_OK, response_model=GetAllPostsRetreiveSchema)
+# @cache(cache_time)
 def get_posts(db: Session = Depends(get_db),
     search: Optional[str] = Query(None, description="Search in title or content"),
     category: Optional[str] = Query(None, description="Filter Posts by their category"),
